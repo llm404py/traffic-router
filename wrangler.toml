@@ -1,0 +1,4 @@
+# Legacy Cloudflare Worker config retained only for repository history.
+# The current project is an Astro static site designed for Vercel or Cloudflare Pages.
+name = "gamehelp-india"
+compatibility_date = "2026-07-10"

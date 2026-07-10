@@ -1,0 +1,71 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+const site = Astro.site || new URL(Astro.url.origin);
+const schemas = [{ '@context':'https://schema.org', '@type':'WebApplication', name:'Online Game Payment Complaint Draft Tool', url:new URL('/tools/complaint-draft/', site), applicationCategory:'UtilitiesApplication', operatingSystem:'Any', isAccessibleForFree:true, description:'Create a factual online-game payment or account complaint draft locally in your browser.' }];
+---
+<BaseLayout title="Online Game Payment Complaint Draft Tool" description="Create a neutral deposit, withdrawal, account or suspected-fraud complaint draft privately in your browser. No form data is sent to GameHelp India." canonicalPath="/tools/complaint-draft/" {schemas}>
+  <main id="main">
+    <section class="page-hero"><span class="kicker">Private on-device tool</span><h1>Create a factual complaint draft</h1><p>Organise transaction details before contacting verified operator support, your bank or cybercrime authorities. The form is not submitted to GameHelp India.</p><div class="independent-note"><strong>Privacy:</strong> The draft is generated in your browser. Do not enter OTP, UPI PIN, passwords, full Aadhaar/PAN, card PIN or CVV.</div></section>
+    <section class="tool-wrap">
+      <div class="tool-card">
+        <form id="draftForm" autocomplete="off">
+          <div class="form-grid">
+            <div class="field"><label for="issue">Issue type</label><select id="issue"><option>Withdrawal</option><option>Deposit</option><option>Account</option><option>KYC</option><option>Suspected fraud</option></select></div>
+            <div class="field"><label for="app">App/platform name</label><input id="app" maxlength="80" placeholder="Exact name shown in your app" /></div>
+            <div class="field"><label for="amount">Amount (₹)</label><input id="amount" inputmode="decimal" maxlength="12" placeholder="Example: 1500" /></div>
+            <div class="field"><label for="date">Transaction date</label><input id="date" type="date" /></div>
+            <div class="field"><label for="reference">UTR/order/withdrawal ID</label><input id="reference" maxlength="100" placeholder="Mask unrelated private data" /></div>
+            <div class="field"><label for="status">Current status</label><select id="status"><option>Pending</option><option>Failed</option><option>Successful but not received</option><option>Rejected</option><option>Account blocked</option><option>Unknown</option></select></div>
+            <div class="field full"><label for="support">What verified support said</label><textarea id="support" maxlength="500" placeholder="Write only the factual response and ticket number"></textarea></div>
+            <div class="field full"><label for="resolution">Resolution requested</label><select id="resolution"><option>Trace and credit the payment</option><option>Return the debited amount</option><option>Provide payout UTR/RRN</option><option>Restore account access and explain the block</option><option>Close the account and return eligible balance</option><option>Provide a written final decision</option></select></div>
+          </div>
+          <div class="actions"><button class="btn btn-primary" type="submit">Generate draft</button><button class="btn btn-secondary" type="button" id="clearBtn">Clear form</button></div>
+          <p class="privacy-chip">No network submission · No account required · Data remains in this browser tab</p>
+        </form>
+        <div class="output" id="output" hidden aria-live="polite"></div>
+        <div class="actions" id="outputActions" hidden><button class="btn btn-primary" id="copyBtn" type="button">Copy draft</button><a class="btn btn-secondary" href="https://cybercrime.gov.in/" rel="noopener noreferrer">Open cybercrime.gov.in ↗</a></div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const form = document.querySelector<HTMLFormElement>('#draftForm')!;
+    const output = document.querySelector<HTMLElement>('#output')!;
+    const outputActions = document.querySelector<HTMLElement>('#outputActions')!;
+    const clearBtn = document.querySelector<HTMLButtonElement>('#clearBtn')!;
+    const copyBtn = document.querySelector<HTMLButtonElement>('#copyBtn')!;
+    const fields = {
+      issue: document.querySelector<HTMLSelectElement>('#issue')!,
+      app: document.querySelector<HTMLInputElement>('#app')!,
+      amount: document.querySelector<HTMLInputElement>('#amount')!,
+      date: document.querySelector<HTMLInputElement>('#date')!,
+      reference: document.querySelector<HTMLInputElement>('#reference')!,
+      status: document.querySelector<HTMLSelectElement>('#status')!,
+      support: document.querySelector<HTMLTextAreaElement>('#support')!,
+      resolution: document.querySelector<HTMLSelectElement>('#resolution')!
+    };
+
+    try {
+      const params = new URLSearchParams(location.search);
+      const issueParam = params.get('issue');
+      const appParam = params.get('app');
+      if (issueParam && [...fields.issue.options].some((option) => option.value === issueParam)) fields.issue.value = issueParam;
+      if (appParam) fields.app.value = appParam.slice(0, 80);
+    } catch (_) {}
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const app = fields.app.value.trim() || '[exact app/platform name]';
+      const amount = fields.amount.value.trim() ? `₹${fields.amount.value.trim()}` : '[amount]';
+      const date = fields.date.value || '[date]';
+      const reference = fields.reference.value.trim() || '[transaction/order reference]';
+      const support = fields.support.value.trim() || 'No clear written resolution has been provided.';
+      const text = `Subject: ${fields.issue.value} complaint — ${app} — ${reference}\n\nTo the verified grievance/support team,\n\nI am writing to request a formal review of a ${fields.issue.value.toLowerCase()} issue on ${app}.\n\nAmount: ${amount}\nTransaction date: ${date}\nReference / UTR / order ID: ${reference}\nCurrent status: ${fields.status.value}\n\nSupport response received:\n${support}\n\nRequested resolution:\n${fields.resolution.value}. Please provide a written update, the relevant ledger or bank transaction reference, and the expected resolution timeline.\n\nI have preserved supporting screenshots and payment records. Sensitive credentials such as OTP, UPI PIN, card PIN and passwords are not included.\n\nRegards,\n[Your name]\n[Registered contact — share only through a verified channel]`;
+      output.textContent = text;
+      output.hidden = false;
+      outputActions.hidden = false;
+      output.scrollIntoView({ behavior:'smooth', block:'center' });
+    });
+    clearBtn.addEventListener('click', () => { form.reset(); output.hidden = true; outputActions.hidden = true; output.textContent = ''; });
+    copyBtn.addEventListener('click', async () => { try { await navigator.clipboard.writeText(output.textContent || ''); copyBtn.textContent = 'Copied'; setTimeout(() => copyBtn.textContent = 'Copy draft', 1400); } catch (_) { copyBtn.textContent = 'Select and copy'; } });
+  </script>
+</BaseLayout>

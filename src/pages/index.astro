@@ -1,0 +1,77 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { helpPages, categories } from '@/data/helpPages';
+
+const featured = helpPages.slice(0, 12);
+const site = Astro.site || new URL(Astro.url.origin);
+const schemas = [
+  {
+    '@context': 'https://schema.org', '@type': 'WebSite',
+    name: 'GameHelp India', url: new URL('/', site),
+    description: 'Independent consumer-safety help for online-game payment, withdrawal, account and APK issues.'
+  },
+  {
+    '@context': 'https://schema.org', '@type': 'Organization',
+    name: 'GameHelp India', url: new URL('/', site),
+    description: 'Independent consumer information site. Not an online-game operator or official support service.'
+  },
+  {
+    '@context': 'https://schema.org', '@type': 'ItemList',
+    name: 'Online game payment and safety guides',
+    itemListElement: featured.map((page, index) => ({ '@type': 'ListItem', position: index + 1, name: page.h1, url: new URL(`/help/${page.slug}/`, site) }))
+  }
+];
+---
+<BaseLayout title="GameHelp India — Deposit, Withdrawal & Scam Safety Help" description="Independent India-focused guidance for online-game deposits, withdrawals, account access, APK safety and suspected financial fraud." canonicalPath="/" {schemas}>
+  <main id="main">
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="kicker">Independent · India-focused · Safety first</span>
+        <h1>Game payment stuck? <em>Save evidence before sending more.</em></h1>
+        <p>Practical checklists for deposit pending, withdrawal not received, blocked accounts, fake customer care and suspicious APKs. We do not operate games or release payments.</p>
+        <div class="actions"><a class="btn btn-primary" href="/help/">Find your issue</a><a class="btn btn-secondary" href="/tools/complaint-draft/">Create complaint draft</a></div>
+        <div class="trust-row"><span>No deposits accepted</span><span>No APK downloads</span><span>No referral links</span><span>No OTP collection</span></div>
+      </div>
+      <div class="hero-panel">
+        <span class="eyebrow" style="color:#d9f99d">Urgent response</span>
+        <h2>Suspect financial fraud?</h2>
+        <p>Contact your bank and report quickly. Do not wait for a private “recovery agent”.</p>
+        <div class="urgent-list"><a href="tel:1930"><span>Call cyber-fraud helpline</span><b>1930</b></a><a href="https://cybercrime.gov.in/" rel="noopener noreferrer"><span>Government complaint portal</span><b>Open ↗</b></a><a href="/help/report-online-game-fraud-india/"><span>Prepare your evidence</span><b>Guide →</b></a></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head"><span class="kicker">Search-intent help library</span><h2>Choose the exact problem</h2><p>Every page addresses a specific issue and points to evidence-based escalation—not another game or payment request.</p></div>
+        <div class="category-tabs" role="group" aria-label="Filter help guides">
+          {categories.map((category) => <button type="button" data-filter={category} class={category === 'All' ? 'active' : ''}>{category}</button>)}
+        </div>
+        <div class="guide-grid" id="guideGrid">
+          {featured.map((page) => <a class="guide-card" href={`/help/${page.slug}/`} data-category={page.category}><span class="tag">{page.category}</span><h3>{page.h1}</h3><p>{page.description}</p><b>Open checklist →</b></a>)}
+        </div>
+        <div class="actions" style="justify-content:center;margin-top:28px"><a class="btn btn-secondary" href="/help/">Browse all {helpPages.length} guides</a></div>
+      </div>
+    </section>
+
+    <section class="section" style="background:#edf6f2">
+      <div class="container split">
+        <div><span class="kicker">Before contacting anyone</span><h2>Five details that make a complaint useful</h2><p>A complete evidence set is safer than posting your phone number or bank screenshot publicly.</p><a class="btn btn-primary" href="/tools/complaint-draft/">Build a private draft</a></div>
+        <div class="steps"><div><span>1</span><p>Exact app package or website domain</p></div><div><span>2</span><p>Transaction UTR/reference and timestamp</p></div><div><span>3</span><p>Deposit or withdrawal order ID</p></div><div><span>4</span><p>Complete written support conversation</p></div><div><span>5</span><p>Bank statement with unrelated details masked</p></div></div>
+      </div>
+    </section>
+
+    <section class="section"><div class="container split"><div><span class="kicker">Fake-support warning</span><h2>A refund never requires your UPI PIN.</h2><p>Anyone asking for OTP, screen sharing, remote access, a refund QR payment or an “unlock fee” should be treated as a serious risk.</p></div><div class="steps"><div><span>×</span><p>Do not share OTP, UPI PIN or card PIN.</p></div><div><span>×</span><p>Do not send KYC documents in Telegram DMs.</p></div><div><span>×</span><p>Do not install a second APK to fix a withdrawal.</p></div><div><span>×</span><p>Do not deposit more to release existing money.</p></div></div></div></section>
+
+    <section class="cta-band"><div><span class="kicker" style="color:#d9f99d">Independent, not official support</span><h2>Organise the facts before you escalate.</h2><p>The complaint tool runs in your browser. GameHelp India does not receive the information you type.</p></div><a class="btn" style="background:#d9f99d;color:#10231f" href="/tools/complaint-draft/">Create complaint draft →</a></section>
+  </main>
+  <script>
+    const buttons = document.querySelectorAll('[data-filter]');
+    const cards = document.querySelectorAll<HTMLElement>('[data-category]');
+    buttons.forEach((button) => button.addEventListener('click', () => {
+      buttons.forEach((b) => b.classList.remove('active'));
+      button.classList.add('active');
+      const selected = button.getAttribute('data-filter');
+      cards.forEach((card) => { card.hidden = selected !== 'All' && card.getAttribute('data-category') !== selected; });
+    }));
+  </script>
+</BaseLayout>

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /_astro/
+Sitemap: https://gamehelp-india.vercel.app/sitemap-index.xml

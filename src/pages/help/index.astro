@@ -1,0 +1,25 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { helpPages, categories } from '@/data/helpPages';
+const site = Astro.site || new URL(Astro.url.origin);
+const schemas = [{ '@context': 'https://schema.org', '@type': 'CollectionPage', name: 'Online Game Payment and Safety Help Guides', url: new URL('/help/', site), description: 'Independent help guides for online-game deposit, withdrawal, account, APK and complaint issues.' }];
+---
+<BaseLayout title="Online Game Payment & Safety Help Guides" description="Browse independent help for game withdrawal pending, deposit not credited, account blocks, APK checks, fake customer care and cybercrime reporting." canonicalPath="/help/" {schemas}>
+  <main id="main">
+    <section class="page-hero"><span class="kicker">Complete help library</span><h1>Online game payment and safety guides</h1><p>Choose the issue that matches your screen. No page can release funds or access accounts; the goal is to help you document and escalate safely.</p><div class="independent-note"><strong>Independent information:</strong> GameHelp India is not affiliated with the apps named in these guides and does not publish deposit, APK or real-money referral links.</div></section>
+    <section class="section"><div class="container">
+      <div class="category-tabs" role="group" aria-label="Filter help guides">{categories.map((category) => <button type="button" data-filter={category} class={category === 'All' ? 'active' : ''}>{category}</button>)}</div>
+      <div class="guide-grid">{helpPages.map((page) => <a class="guide-card" href={`/help/${page.slug}/`} data-category={page.category}><span class="tag">{page.category}</span><h3>{page.h1}</h3><p>{page.description}</p><b>Open guide →</b></a>)}</div>
+    </div></section>
+  </main>
+  <script>
+    const buttons = document.querySelectorAll('[data-filter]');
+    const cards = document.querySelectorAll<HTMLElement>('[data-category]');
+    buttons.forEach((button) => button.addEventListener('click', () => {
+      buttons.forEach((b) => b.classList.remove('active'));
+      button.classList.add('active');
+      const selected = button.getAttribute('data-filter');
+      cards.forEach((card) => { card.hidden = selected !== 'All' && card.getAttribute('data-category') !== selected; });
+    }));
+  </script>
+</BaseLayout>
