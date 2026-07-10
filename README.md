@@ -85,7 +85,7 @@ Then open **Actions → Deploy to Vercel → Run workflow**. The deployment is m
 
 After deployment, verify `/sitemap-index.xml`.
 
-The fallback production URL in `astro.config.mjs` is `https://gamehelp-india.vercel.app`. Change the variable if the Vercel project receives a different URL.
+The fallback production URL in `astro.config.mjs` is `https://traffic-router-puce.vercel.app`. Override `SITE_URL` only if the production URL changes.
 
 ### Vercel plan note
 
